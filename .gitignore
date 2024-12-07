@@ -1,0 +1,12 @@
+/venv/
+/.idea/
+__pycache__/
+/data/
+/logs/*
+/images/*
+.env
+*.db
+*.csv
+*.log
+!.gitkeep
+temp.py
