@@ -1,3 +1,5 @@
+import os
+
 from dotenv import load_dotenv
 from loguru import logger
 
@@ -13,6 +15,9 @@ headers = {
     'accept': 'application/json, text/javascript, */*; q=0.01',
     'user-agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/101.0.4951.54 Safari/537.36'
 }
+
+BOT_TOKEN = os.getenv('BOT_TOKEN')
+SUPERADMIN = os.getenv('SUPERADMIN')
 
 
 @dataclass

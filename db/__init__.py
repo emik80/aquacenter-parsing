@@ -1,1 +1,1 @@
-from .dbmodels import db, Task, Product, User
+from .dbmodels import db, Task, Product, User, initialize_database

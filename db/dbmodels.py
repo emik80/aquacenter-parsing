@@ -58,11 +58,8 @@ class User(BaseModel):
 def initialize_database(db: SqliteDatabase):
     try:
         with db:
-            db.create_tables([Task, Product], safe=True)
+            db.create_tables([Task, Product, User], safe=True)
             logger.success('DB initialized')
     except Exception as ex:
         logger.error(f"Error writing data: {ex}")
         return
-
-
-initialize_database(db)
