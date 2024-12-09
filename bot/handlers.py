@@ -1,3 +1,5 @@
+import time
+
 from aiogram import Router, F, Bot
 from aiogram.fsm.context import FSMContext
 from aiogram.fsm.state import default_state
@@ -69,15 +71,20 @@ async def process_category(message: Message, state: FSMContext):
     text = (f'Введені дані:\n'
             f'URL: {user_data.get("category_url")}\n'
             f'Категорія для додавання товарів: {user_data.get("target_category")}')
-    await state.set_state(FSMCommon.enter_category)
+    await state.set_state(FSMCommon.run)
     await message.answer(text=text)
 
 
-@router.message(F.text.in_({'RUN'}), StateFilter(FSMCommon.active))
+@router.message(F.text.in_({'RUN'}), StateFilter(FSMCommon.run))
 async def process_command_run(message: Message, state: FSMContext):
-    text = BOT_MESSAGES.get('source url')
-    await state.set_state(FSMCommon.enter_url)
-    await message.answer(text=text)
+    print('RUN')
+    await message.answer(text='Делаю вид, что идет парсинг')
+    time.sleep(20)
+    await state.clear()
+    await state.update_data(user_id=message.from_user.id,
+                            username=message.from_user.username)
+    await state.set_state(FSMCommon.active)
+    await message.answer(text='DONE')
 
 
 # Other messages

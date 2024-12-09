@@ -26,6 +26,8 @@ class BaseParserConfig:
     HEADERS: dict
     DATA_DIR: Path
     DATABASE: Path
+    BOT_TOKEN: str
+    SUPERADMIN: str
 
 
 def load_config():
@@ -43,6 +45,8 @@ def load_config():
         HEADERS=headers,
         DATA_DIR=Path(ROOT_DIR.parent, DATA_DIR),
         DATABASE=Path(ROOT_DIR.parent, DATA_DIR, DATABASE),
+        BOT_TOKEN=os.getenv('BOT_TOKEN'),
+        SUPERADMIN=os.getenv('SUPERADMIN'),
         )
 
     logger.info('Configuration Loaded')
