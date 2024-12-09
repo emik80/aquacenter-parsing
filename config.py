@@ -8,7 +8,7 @@ ROOT_DIR = Path(__file__)
 DATA_DIR = 'data'
 DATABASE = 'products.db'
 LOG_DIR = 'logs'
-MAIN_DOMAN = 'https://aquapolis.ua'
+MAIN_DOMAN = 'aquapolis.ua'
 headers = {
     'accept': 'application/json, text/javascript, */*; q=0.01',
     'user-agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/101.0.4951.54 Safari/537.36'

@@ -1,5 +1,6 @@
-from peewee import SqliteDatabase, Model, CharField, ForeignKeyField, TextField, DateTimeField, \
-    IntegerField, DecimalField, FloatField, BooleanField
+from datetime import datetime
+
+from peewee import SqliteDatabase, Model, CharField, TextField, DateTimeField, IntegerField, BooleanField
 
 from config import parser_config, logger
 
@@ -11,34 +12,38 @@ class BaseModel(Model):
         database = db
 
 
-class Categories(BaseModel):
+class Task(BaseModel):
     class Meta:
-        db_table = 'Categories'
+        db_table = 'Tasks'
 
-    cat_name = CharField()
-    cat_url = CharField(unique=True)
-    cat_qty = IntegerField(unique=True)
+    source_url = CharField()
+    source_category_name = CharField(null=True)
+    target_category = CharField()
+    status = CharField()
+    urls = TextField(null=True)
+    cat_qty = IntegerField(null=True)
+    start = DateTimeField(formats='%Y-%m-%d %H:%M:%S')
+    end = DateTimeField(null=True, formats='%Y-%m-%d %H:%M:%S')
 
 
 class Product(BaseModel):
     class Meta:
         db_table = 'Products'
 
-    status = CharField(default='in queue')
-    product_name = CharField()
-    product_url = CharField(unique=True)
-    source_category = ForeignKeyField(Categories, backref='category', field='cat_url')
-    target_category = CharField(null=True)
+    product_url = CharField(null=True)
+    product_name = CharField(null=True)
+    target_category = CharField()
 
     product_code = CharField(null=True)
+    price = IntegerField(null=True)
     stock = IntegerField(null=True)
-    price = DecimalField(null=True)
 
     description = TextField(null=True)
     specs_table = TextField(null=True)
     images = TextField(null=True)
 
-    created_at = DateTimeField(formats='%Y-%m-%d %H:%M:%S')
+    status = CharField(default='new')
+    created_at = DateTimeField(default=datetime.now(), formats='%Y-%m-%d %H:%M:%S')
     modified_at = DateTimeField(null=True, formats='%Y-%m-%d %H:%M:%S')
 
 
@@ -53,7 +58,7 @@ class User(BaseModel):
 def initialize_database(db: SqliteDatabase):
     try:
         with db:
-            db.create_tables([Product, Categories], safe=True)
+            db.create_tables([Task, Product], safe=True)
             logger.success('DB initialized')
     except Exception as ex:
         logger.error(f"Error writing data: {ex}")

@@ -1,10 +1,24 @@
-from typing import Optional, Tuple, Dict
+from datetime import datetime
+from pathlib import Path
+from random import randint
+from time import time
+from typing import Optional, Dict
+import csv
 
 import requests
 from bs4 import BeautifulSoup
-import csv
 
 from config import parser_config, logger
+from db import Task
+
+
+def time_of_function(function):
+    def wrapped(*args):
+        start_time = time()
+        res = function(*args)
+        logger.info(f'Task completed in {round(time() - start_time, 2)} seconds')
+        return res
+    return wrapped
 
 
 def soup_maker(url: str) -> Optional[BeautifulSoup]:
@@ -56,8 +70,85 @@ def dict_to_html_table(data_dict: Dict) -> str:
 
         html.append('</tr>')
     html.append('</table>')
-    return '\n'.join(html)
+    return ''.join(html)
 
 
-def data_to_csv():
-    pass
+def data_to_csv(queryset) -> Path | None:
+    file_name = f'products_{datetime.now().strftime('%Y%m%d')}_{randint(1, 10000000)}.csv'
+    output_filename = Path(parser_config.DATA_DIR, file_name)
+
+    headers = [
+        'product_name',
+        'product_url',
+        'target_category',
+        'product_code',
+        'price',
+        'stock',
+        'description',
+        'specs_table',
+        'images',
+    ]
+    try:
+        with open(output_filename, 'w', newline='', encoding='utf-8') as csv_file:
+            csv_writer = csv.writer(csv_file)
+            csv_writer.writerow(headers)
+            for product in queryset:
+                row = [
+                    product.product_name,
+                    product.product_url,
+                    product.target_category,
+                    product.product_code,
+                    product.price,
+                    product.stock,
+                    product.description,
+                    product.specs_table,
+                    product.images,
+                ]
+                csv_writer.writerow(row)
+            logger.success(f'CSV file saved at {output_filename}')
+            return output_filename
+
+    except Exception as ex:
+        logger.exception(f'Error generating csv {ex}')
+        return None
+
+
+def get_current_task(category_url):
+    try:
+        task = (Task.select()
+                .where(Task.source_url == category_url, Task.status == 'running')
+                .order_by(Task.start.desc())
+                .first())
+        return task
+    except Exception as ex:
+        logger.exception(f'Error getting task {ex}')
+        return
+
+
+def task_error(category_url):
+    try:
+        task = (Task.select()
+                .where(Task.source_url == category_url, Task.status == 'running')
+                .order_by(Task.start.desc())
+                .first())
+        if task:
+            task.status = 'error'
+            task.save()
+    except Exception as ex:
+        logger.exception(f'Error task update {ex}')
+        return None
+
+
+def task_finish(category_url):
+    try:
+        task = (Task.select()
+                .where(Task.source_url == category_url, Task.status == 'running')
+                .order_by(Task.start.desc())
+                .first())
+        if task:
+            task.end = datetime.now()
+            task.status = 'finish'
+            task.save()
+    except Exception as ex:
+        logger.exception(f'Error task update {ex}')
+        return
