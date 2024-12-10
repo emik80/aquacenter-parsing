@@ -1,19 +1,21 @@
 import time
+from typing import Union
 
 from aiogram import Router, F, Bot
 from aiogram.fsm.context import FSMContext
 from aiogram.fsm.state import default_state
-from aiogram.types import Message, ReplyKeyboardRemove
+from aiogram.types import Message, ReplyKeyboardRemove, CallbackQuery
 from aiogram.filters import CommandStart, Command, StateFilter
 
 from config import logger, parser_config
 from text import BOT_MESSAGES
-# from keyboards import kb_types, kb_finish
+from keyboards import create_inline_kb
 from states import FSMCommon, FSMAdmin
 
 
 router = Router()
 router.message.filter(F.chat.type.in_({"private"}))
+router.callback_query.filter(F.message.chat.type.in_({"private"}))
 
 
 # Help
@@ -29,27 +31,44 @@ async def process_command_start(message: Message, state: FSMContext):
     await state.set_state(FSMCommon.active)
     await state.update_data(user_id=message.from_user.id,
                             username=message.from_user.username)
+    kb = create_inline_kb(
+        parse='✅ Парсер'
+    )
     await message.answer(text=BOT_MESSAGES.get('start'),
-                         reply_markup=ReplyKeyboardRemove())
+                         reply_markup=kb)
 
 
 # Cancel
-@router.message(F.text.in_({'❌ Cancel', '/cancel'}))
-async def process_command_cancel(message: Message, state: FSMContext):
+@router.message(F.text.in_({'/cancel'}))
+@router.callback_query(F.data == 'cancel')
+async def process_command_cancel(event: Union[Message, CallbackQuery], state: FSMContext):
     text = BOT_MESSAGES.get('cancel_selected')
+    kb = create_inline_kb(
+        parse='✅ Парсер'
+    )
+    if isinstance(event, Message):
+        message = event
+        await message.answer(text=text,
+                             reply_markup=kb)
+    else:  # CallbackQuery
+        message = event.message
+        await event.message.edit_text(text=text, reply_markup=kb)
+        await event.answer()
     await state.clear()
-    await state.update_data(user_id=message.from_user.id,
-                            username=message.from_user.username)
-    await message.answer(text=text, reply_markup=ReplyKeyboardRemove())
+    await state.update_data(
+        user_id=message.from_user.id,
+        username=message.from_user.username
+    )
     await state.set_state(FSMCommon.active)
 
 
 # Parsing
-@router.message(F.text.in_({'Parsing'}), StateFilter(FSMCommon.active))
-async def process_command_parsing(message: Message, state: FSMContext):
-    text = BOT_MESSAGES.get('source url')
+@router.callback_query(F.data == 'parse', StateFilter(FSMCommon.active))
+async def process_command_parsing(callback: CallbackQuery, state: FSMContext):
+    await callback.message.edit_reply_markup(reply_markup=None)
     await state.set_state(FSMCommon.enter_url)
-    await message.answer(text=text)
+    text = BOT_MESSAGES.get('source url')
+    await callback.message.answer(text=text)
 
 
 # Enter URL
@@ -70,25 +89,34 @@ async def process_category(message: Message, state: FSMContext):
     user_data = await state.get_data()
     text = (f'Введені дані:\n'
             f'URL: {user_data.get("category_url")}\n'
-            f'Категорія для додавання товарів: {user_data.get("target_category")}')
+            f'Категорія для додавання товарів:\n{user_data.get("target_category")}')
     await state.set_state(FSMCommon.run)
-    await message.answer(text=text)
+    kb = create_inline_kb(
+        2,
+        run='✅ Почати',
+        cancel='❌ Скасувати'
+    )
+    await message.answer(text=text, reply_markup=kb)
 
 
-@router.message(F.text.in_({'RUN'}), StateFilter(FSMCommon.run))
-async def process_command_run(message: Message, state: FSMContext):
+@router.callback_query(F.data == 'run', StateFilter(FSMCommon.run))
+async def process_command_run(callback: CallbackQuery, state: FSMContext):
+    await callback.message.edit_reply_markup(reply_markup=None)
     print('RUN')
-    await message.answer(text='Делаю вид, что идет парсинг')
-    time.sleep(20)
+    message = await callback.message.answer(text='Парсинг запущено')
+    ...
     await state.clear()
-    await state.update_data(user_id=message.from_user.id,
-                            username=message.from_user.username)
+    await state.update_data(user_id=callback.message.from_user.id,
+                            username=callback.message.from_user.username)
     await state.set_state(FSMCommon.active)
-    await message.answer(text='DONE')
+    kb = create_inline_kb(
+        parse='✅ Парсер'
+    )
+    await message.edit_text(text='DONE', reply_markup=kb)
 
 
 # Other messages
-@router.message(~StateFilter(FSMCommon.active), ~StateFilter(FSMAdmin.admin))
+@router.message(StateFilter(FSMCommon.active), ~StateFilter(FSMAdmin.admin))
 async def send_error(message: Message):
     try:
         await message.answer(text=BOT_MESSAGES.get('error'))
