@@ -9,7 +9,6 @@ import requests
 from bs4 import BeautifulSoup
 
 from config import parser_config, logger
-from db import Task
 
 
 def time_of_function(function):
@@ -111,44 +110,3 @@ def data_to_csv(queryset) -> Path | None:
     except Exception as ex:
         logger.exception(f'Error generating csv {ex}')
         return None
-
-
-def get_current_task(category_url):
-    try:
-        task = (Task.select()
-                .where(Task.source_url == category_url, Task.status == 'running')
-                .order_by(Task.start.desc())
-                .first())
-        return task
-    except Exception as ex:
-        logger.exception(f'Error getting task {ex}')
-        return
-
-
-def task_error(category_url):
-    try:
-        task = (Task.select()
-                .where(Task.source_url == category_url, Task.status == 'running')
-                .order_by(Task.start.desc())
-                .first())
-        if task:
-            task.status = 'error'
-            task.save()
-    except Exception as ex:
-        logger.exception(f'Error task update {ex}')
-        return None
-
-
-def task_finish(category_url):
-    try:
-        task = (Task.select()
-                .where(Task.source_url == category_url, Task.status == 'running')
-                .order_by(Task.start.desc())
-                .first())
-        if task:
-            task.end = datetime.now()
-            task.status = 'finish'
-            task.save()
-    except Exception as ex:
-        logger.exception(f'Error task update {ex}')
-        return

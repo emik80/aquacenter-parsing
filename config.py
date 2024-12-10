@@ -6,18 +6,16 @@ from loguru import logger
 from dataclasses import dataclass
 from pathlib import Path
 
-ROOT_DIR = Path(__file__)
-DATA_DIR = 'data'
-DATABASE = 'products.db'
-LOG_DIR = 'logs'
-MAIN_DOMAIN = os.getenv('MAIN_DOMAIN')
+
 headers = {
     'accept': 'application/json, text/javascript, */*; q=0.01',
     'user-agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/101.0.4951.54 Safari/537.36'
 }
 
-BOT_TOKEN = os.getenv('BOT_TOKEN')
-SUPERADMIN = os.getenv('SUPERADMIN')
+ROOT_DIR = Path(__file__)
+DATA_DIR = 'data'
+DATABASE = 'products.db'
+LOG_DIR = 'logs'
 
 
 @dataclass
@@ -41,7 +39,7 @@ def load_config():
     load_dotenv()
 
     config = BaseParserConfig(
-        MAIN_DOMAIN=MAIN_DOMAIN,
+        MAIN_DOMAIN=os.getenv('MAIN_DOMAIN'),
         HEADERS=headers,
         DATA_DIR=Path(ROOT_DIR.parent, DATA_DIR),
         DATABASE=Path(ROOT_DIR.parent, DATA_DIR, DATABASE),

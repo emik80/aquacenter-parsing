@@ -12,7 +12,7 @@ import service as service_tools
 
 def _check_url(url: str) -> bool:
     parsed_domain = urlparse(url).netloc
-    if parsed_domain == parser_config.MAIN_DOMAIN:
+    if parsed_domain == str(parser_config.MAIN_DOMAIN):
         return True
     else:
         logger.warning(f'URL does not match {parser_config.MAIN_DOMAIN}')
