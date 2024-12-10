@@ -16,7 +16,7 @@ ROOT_DIR = Path(__file__)
 DATA_DIR = 'data'
 DATABASE = 'products.db'
 LOG_DIR = 'logs'
-
+PRODUCTION = os.getenv("PRODUCTION", "FALSE").upper() == "TRUE"
 
 @dataclass
 class BaseParserConfig:
@@ -48,7 +48,7 @@ def load_config():
         BOT_TOKEN=os.getenv('BOT_TOKEN'),
         SUPERADMIN=os.getenv('SUPERADMIN'),
         PRODUCT_QTY=int(os.getenv('PRODUCT_QTY')),
-        REDIS_HOST=os.getenv('REDIS_HOST'),
+        REDIS_HOST=os.getenv("PROD_REDIS_HOST") if PRODUCTION else os.getenv("REDIS_HOST"),
         )
 
     logger.info('Configuration Loaded')

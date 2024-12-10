@@ -18,11 +18,13 @@ def collect_product_list(current_task: Task, url: str) -> Dict | None:
         logger.warning(f'{url} is probably incorrect...')
         return None
 
+    items_qty = category_data.get('items_qty')
     source_category_name = category_data.get('cat_name')
     product_urls = category_data.get('product_urls')
     try:
         task = current_task
         task.source_category_name = source_category_name
+        task.cat_qty = items_qty
         task.urls = json.dumps(product_urls)
         task.save()
     except Exception as e:

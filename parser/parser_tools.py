@@ -1,4 +1,5 @@
 import math
+import re
 
 from typing import Dict, List
 
@@ -13,7 +14,7 @@ def get_product_list(category_url: str) -> Dict | None:
     else:
         cat_name = res.get('cat_name')
         pages = res.get('pages')
-        # items_qty = res.get('items_qty')
+        items_qty = res.get('items_qty')
 
     product_urls = []
     for page in pages:
@@ -32,7 +33,8 @@ def get_product_list(category_url: str) -> Dict | None:
 
     category_data = {
         'product_urls': product_urls,
-        'cat_name': cat_name
+        'cat_name': cat_name,
+        'items_qty': items_qty
     }
     return category_data
 
@@ -43,21 +45,28 @@ def _get_pagination(category_url: str) -> Dict | None:
     if not soup:
         return None
 
+    pages = [category_url, ]
+
     try:
-        items_qty = soup.find_all('span', class_='toolbar-number')[-1].text
+        is_pagination = soup.find(class_="pages")
+        if is_pagination:
+            items_qty = soup.find_all('span', class_='toolbar-number')[-1].text
+            if items_qty and int(items_qty) > 30:
+                pages_qty = int(items_qty) // 30 + 1
+                for i in range(2, pages_qty + 1):
+                    pages.append(f'{category_url}?p={i}')
+        else:
+            script_tag = soup.find('p', class_='toolbar-amount').find('script').string
+            item_count_match = re.search(r'let\s+itemCount\s*=\s*(\d+);', script_tag)
+            items_qty = int(item_count_match.group(1))
     except Exception as ex:
         logger.exception(f'{category_url} - items_qty: {ex}')
         items_qty = None
 
-    pages = [category_url, ]
-    if items_qty:
-        pages_qty = int(items_qty) // 30 + 1
-        if pages_qty > 1:
-            for i in range(2, pages_qty + 1):
-                pages.append(f'{category_url}?p={i}')
     res = {
         'cat_name': cat_name,
         'pages': pages,
+        'items_qty': items_qty
     }
     return res
 
