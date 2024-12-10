@@ -30,8 +30,6 @@ async def process_command_help(message: Message):
 async def process_command_start(message: Message, state: FSMContext):
     await state.clear()
     await state.set_state(FSMCommon.active)
-    await state.update_data(user_id=message.from_user.id,
-                            username=message.from_user.username)
     kb = create_inline_kb(
         parse='✅ Парсер'
     )
@@ -52,14 +50,9 @@ async def process_command_cancel(event: Union[Message, CallbackQuery], state: FS
         await message.answer(text=text,
                              reply_markup=kb)
     else:  # CallbackQuery
-        message = event.message
         await event.message.edit_text(text=text, reply_markup=kb)
         await event.answer()
     await state.clear()
-    await state.update_data(
-        user_id=message.from_user.id,
-        username=message.from_user.username
-    )
     await state.set_state(FSMCommon.active)
 
 
@@ -121,8 +114,6 @@ async def process_command_run(callback: CallbackQuery, state: FSMContext):
     if current_task:
         task_warning(current_task)
     await state.clear()
-    await state.update_data(user_id=callback.message.from_user.id,
-                            username=callback.message.from_user.username)
     await state.set_state(FSMCommon.active)
     kb = create_inline_kb(
         parse='✅ Парсер'

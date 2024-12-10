@@ -2,6 +2,7 @@ import asyncio
 
 from aiogram import Bot, Dispatcher
 from aiogram.exceptions import TelegramNetworkError
+from aiogram.fsm.storage.redis import RedisStorage, Redis
 
 import handlers
 from middlewares import setup_middlewares
@@ -16,10 +17,10 @@ async def main():
     initialize_database(db)
     bot = Bot(token=parser_config.BOT_TOKEN)
 
-    redis = Redis(host=bot_config.REDIS_HOST)
+    redis = Redis(host=parser_config.REDIS_HOST)
     storage = RedisStorage(redis=redis)
 
-    dp = Dispatcher()
+    dp = Dispatcher(storage=storage)
     await set_main_menu(bot)
     setup_middlewares(dp, bot)
 

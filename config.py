@@ -27,6 +27,7 @@ class BaseParserConfig:
     BOT_TOKEN: str
     SUPERADMIN: str
     PRODUCT_QTY: int
+    REDIS_HOST: str
 
 
 def load_config():
@@ -47,6 +48,7 @@ def load_config():
         BOT_TOKEN=os.getenv('BOT_TOKEN'),
         SUPERADMIN=os.getenv('SUPERADMIN'),
         PRODUCT_QTY=int(os.getenv('PRODUCT_QTY')),
+        REDIS_HOST=os.getenv('REDIS_HOST'),
         )
 
     logger.info('Configuration Loaded')
