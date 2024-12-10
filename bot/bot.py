@@ -4,7 +4,7 @@ from aiogram import Bot, Dispatcher
 from aiogram.exceptions import TelegramNetworkError
 
 import handlers
-from middlewares import AllowedUsersMiddleware
+from middlewares import setup_middlewares
 from keyboards import set_main_menu
 from config import logger, parser_config
 from db import db, initialize_database
@@ -15,23 +15,13 @@ async def main():
     logger.info('Starting bot')
     initialize_database(db)
     bot = Bot(token=parser_config.BOT_TOKEN)
-    logger.info('Bot initialized')
-
     dp = Dispatcher()
-    logger.info('Dispatcher initialized')
-
-    # Set Menu Button
     await set_main_menu(bot)
-    logger.info('Main menu set')
+    setup_middlewares(dp, bot)
 
-    # Middlewares registration
-    dp.message.outer_middleware(AllowedUsersMiddleware(bot=bot))
-    logger.info('Middlewares registered')
-
-    # Routers registration
     # dp.include_router(admin.router)
     dp.include_router(handlers.router)
-    logger.info('Routers registered')
+    logger.info('READY')
 
     while True:
         try:

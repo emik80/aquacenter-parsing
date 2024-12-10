@@ -1,4 +1,3 @@
-import time
 from typing import Union
 
 from aiogram import Router, F, Bot
@@ -102,8 +101,10 @@ async def process_category(message: Message, state: FSMContext):
 @router.callback_query(F.data == 'run', StateFilter(FSMCommon.run))
 async def process_command_run(callback: CallbackQuery, state: FSMContext):
     await callback.message.edit_reply_markup(reply_markup=None)
-    print('RUN')
     message = await callback.message.answer(text='Парсинг запущено')
+    user_data = await state.get_data()
+    category_url = user_data.get('category_url')
+    target_category = user_data.get('target_category')
     ...
     await state.clear()
     await state.update_data(user_id=callback.message.from_user.id,
