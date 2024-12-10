@@ -1,9 +1,9 @@
 import math
 
-from config import logger
 from typing import Dict, List
 
 import service as service_tools
+from config import logger, parser_config
 
 
 def get_product_list(category_url: str) -> Dict | None:
@@ -13,7 +13,7 @@ def get_product_list(category_url: str) -> Dict | None:
     else:
         cat_name = res.get('cat_name')
         pages = res.get('pages')
-        items_qty = res.get('items_qty')
+        # items_qty = res.get('items_qty')
 
     product_urls = []
     for page in pages:
@@ -32,7 +32,6 @@ def get_product_list(category_url: str) -> Dict | None:
 
     category_data = {
         'product_urls': product_urls,
-        'items_qty': items_qty,
         'cat_name': cat_name
     }
     return category_data
@@ -48,17 +47,17 @@ def _get_pagination(category_url: str) -> Dict | None:
         items_qty = soup.find_all('span', class_='toolbar-number')[-1].text
     except Exception as ex:
         logger.exception(f'{category_url} - items_qty: {ex}')
-        return None
+        items_qty = None
 
     pages = [category_url, ]
-    pages_qty = int(items_qty) // 30 + 1
-    if pages_qty > 1:
-        for i in range(2, pages_qty + 1):
-            pages.append(f'{category_url}?p={i}')
+    if items_qty:
+        pages_qty = int(items_qty) // 30 + 1
+        if pages_qty > 1:
+            for i in range(2, pages_qty + 1):
+                pages.append(f'{category_url}?p={i}')
     res = {
         'cat_name': cat_name,
         'pages': pages,
-        'items_qty': int(items_qty)
     }
     return res
 
@@ -81,7 +80,7 @@ def get_product_info(url: str) -> List[Dict] | None:
                                  find_next('span', attrs={"data-price-amount": True}).
                                  get('data-price-amount'))
                 in_stock = variant.find(class_='col qty').get_text().strip()
-                stock = 0 if in_stock == 'Немає у наявності' else 1
+                stock = 0 if in_stock == 'Немає у наявності' else parser_config.PRODUCT_QTY
                 product_attrs = {
                     'product_name': product_name,
                     'product_code': product_code,
@@ -99,7 +98,8 @@ def get_product_info(url: str) -> List[Dict] | None:
                              get('data-price-amount'))
 
             stock_unavailable = soup.find('div', class_='stock unavailable')
-            stock = 0 if stock_unavailable and stock_unavailable.text.strip() == 'Немає у наявності' else 1
+            stock = 0 if stock_unavailable and stock_unavailable.text.strip() == 'Немає у наявності' \
+                else parser_config.PRODUCT_QTY
             product_attrs = {
                 'product_name': product_name,
                 'product_code': product_code,

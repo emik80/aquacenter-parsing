@@ -26,6 +26,7 @@ class BaseParserConfig:
     DATABASE: Path
     BOT_TOKEN: str
     SUPERADMIN: str
+    PRODUCT_QTY: int
 
 
 def load_config():
@@ -45,6 +46,7 @@ def load_config():
         DATABASE=Path(ROOT_DIR.parent, DATA_DIR, DATABASE),
         BOT_TOKEN=os.getenv('BOT_TOKEN'),
         SUPERADMIN=os.getenv('SUPERADMIN'),
+        PRODUCT_QTY=int(os.getenv('PRODUCT_QTY')),
         )
 
     logger.info('Configuration Loaded')

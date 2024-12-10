@@ -1,29 +1,16 @@
 import json
 from datetime import datetime
 from typing import Dict
-from urllib.parse import urlparse
 from peewee import IntegrityError
 
-from config import logger, parser_config
+from config import logger
 from db import Product, Task
 from .parser_tools import get_product_list, get_product_info
 import service as service_tools
 
 
-def _check_url(url: str) -> bool:
-    parsed_domain = urlparse(url).netloc
-    if parsed_domain == str(parser_config.MAIN_DOMAIN):
-        return True
-    else:
-        logger.warning(f'URL does not match {parser_config.MAIN_DOMAIN}')
-        return False
-
-
 @service_tools.time_of_function
 def collect_product_list(current_task: Task, url: str) -> Dict | None:
-    if not _check_url(url):
-        return None
-
     logger.info(f'Parsing of category {url} starting...')
 
     category_data = get_product_list(url)
@@ -35,7 +22,6 @@ def collect_product_list(current_task: Task, url: str) -> Dict | None:
     product_urls = category_data.get('product_urls')
     try:
         task = current_task
-        task.cat_qty = category_data.get('items_qty')
         task.source_category_name = source_category_name
         task.urls = json.dumps(product_urls)
         task.save()

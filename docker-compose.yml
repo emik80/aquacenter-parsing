@@ -1,0 +1,36 @@
+version: '3'
+
+services:
+  app:
+    build:
+      context: .
+    restart: unless-stopped
+    volumes:
+      - data:/app/data
+      - logs:/app/logs
+    depends_on:
+      - redis
+    env_file:
+      - .env
+    command: python bot/bot.py
+
+  redis:
+    image: "redis:7.4.1-alpine3.20"
+    restart: unless-stopped
+    volumes:
+      - redis_data:/data
+
+volumes:
+  redis_data:
+  data:
+    driver: local
+    driver_opts:
+      type: none
+      device: $PWD/img
+      o: bind
+  logs:
+    driver: local
+    driver_opts:
+      type: none
+      device: $PWD/logs
+      o: bind

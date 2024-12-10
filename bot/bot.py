@@ -15,6 +15,10 @@ async def main():
     logger.info('Starting bot')
     initialize_database(db)
     bot = Bot(token=parser_config.BOT_TOKEN)
+
+    redis = Redis(host=bot_config.REDIS_HOST)
+    storage = RedisStorage(redis=redis)
+
     dp = Dispatcher()
     await set_main_menu(bot)
     setup_middlewares(dp, bot)

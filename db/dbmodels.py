@@ -21,7 +21,6 @@ class Task(BaseModel):
     target_category = CharField()
     status = CharField()
     urls = TextField(null=True)
-    cat_qty = IntegerField(null=True)
     start = DateTimeField(formats='%Y-%m-%d %H:%M:%S')
     end = DateTimeField(null=True, formats='%Y-%m-%d %H:%M:%S')
 

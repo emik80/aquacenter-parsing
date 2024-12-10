@@ -1,2 +1,2 @@
-from .core import parser_core
+from .core import ParserCore, ParserCoreTG
 from .operations import *

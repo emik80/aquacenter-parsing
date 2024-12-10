@@ -2,6 +2,7 @@ from datetime import datetime
 
 from db import Task
 from config import logger
+from peewee import OperationalError, DatabaseError
 
 
 def create_task(category_url: str, target_category: str) -> bool:
@@ -26,8 +27,10 @@ def get_current_task(category_url):
                 .order_by(Task.start.desc())
                 .first())
         return task
-    except Exception as ex:
-        logger.exception(f'Error getting task {ex}')
+    except OperationalError as ex:
+        logger.exception(f"Database connection issue: {ex}")
+    except DatabaseError as ex:
+        logger.exception(f"Database query error: {ex}")
         return
 
 
@@ -35,8 +38,10 @@ def task_error(task):
     try:
         task.status = 'error'
         task.save()
-    except Exception as ex:
-        logger.exception(f'Error task update {ex}')
+    except OperationalError as ex:
+        logger.exception(f"Database connection issue: {ex}")
+    except DatabaseError as ex:
+        logger.exception(f"Database query error: {ex}")
         return None
 
 
@@ -45,6 +50,19 @@ def task_finish(task):
         task.end = datetime.now()
         task.status = 'finish'
         task.save()
-    except Exception as ex:
-        logger.exception(f'Error task update {ex}')
+    except OperationalError as ex:
+        logger.exception(f"Database connection issue: {ex}")
+    except DatabaseError as ex:
+        logger.exception(f"Database query error: {ex}")
+        return
+
+
+def task_warning(task):
+    try:
+        task.status = 'warning'
+        task.save()
+    except OperationalError as ex:
+        logger.exception(f"Database connection issue: {ex}")
+    except DatabaseError as ex:
+        logger.exception(f"Database query error: {ex}")
         return

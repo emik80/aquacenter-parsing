@@ -1,15 +1,17 @@
 from typing import Union
 
-from aiogram import Router, F, Bot
+from aiogram import Router, F
 from aiogram.fsm.context import FSMContext
 from aiogram.fsm.state import default_state
-from aiogram.types import Message, ReplyKeyboardRemove, CallbackQuery
+from aiogram.types import Message, ReplyKeyboardRemove, CallbackQuery, FSInputFile
 from aiogram.filters import CommandStart, Command, StateFilter
 
-from config import logger, parser_config
+from config import logger
+from parser import ParserCoreTG
 from text import BOT_MESSAGES
 from keyboards import create_inline_kb
 from states import FSMCommon, FSMAdmin
+from db import task_warning
 
 
 router = Router()
@@ -105,7 +107,19 @@ async def process_command_run(callback: CallbackQuery, state: FSMContext):
     user_data = await state.get_data()
     category_url = user_data.get('category_url')
     target_category = user_data.get('target_category')
-    ...
+    parser = ParserCoreTG(
+        category_url=category_url,
+        target_category=target_category,
+        user_message=message
+    )
+    output_filename, current_task = await parser.run_parsing()
+    if output_filename:
+        await message.answer_document(
+            document=FSInputFile(output_filename),
+            caption='Файл'
+        )
+    if current_task:
+        task_warning(current_task)
     await state.clear()
     await state.update_data(user_id=callback.message.from_user.id,
                             username=callback.message.from_user.username)

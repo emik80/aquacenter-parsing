@@ -6,7 +6,6 @@ from aiogram.types import InlineKeyboardMarkup, InlineKeyboardButton
 from text import MENU_COMMANDS
 
 
-# Menu Button
 async def set_main_menu(bot: Bot):
     main_menu_commands = [BotCommand(
                                 command=command,
