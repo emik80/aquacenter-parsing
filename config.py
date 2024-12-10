@@ -26,7 +26,6 @@ class BaseParserConfig:
     DATABASE: Path
     BOT_TOKEN: str
     SUPERADMIN: str
-    PRODUCT_QTY: int
     REDIS_HOST: str
 
 
@@ -47,7 +46,6 @@ def load_config():
         DATABASE=Path(ROOT_DIR.parent, DATA_DIR, DATABASE),
         BOT_TOKEN=os.getenv('BOT_TOKEN'),
         SUPERADMIN=os.getenv('SUPERADMIN'),
-        PRODUCT_QTY=int(os.getenv('PRODUCT_QTY')),
         REDIS_HOST=os.getenv("PROD_REDIS_HOST") if PRODUCTION else os.getenv("REDIS_HOST"),
         )
 

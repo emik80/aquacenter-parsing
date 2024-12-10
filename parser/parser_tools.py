@@ -89,7 +89,7 @@ def get_product_info(url: str) -> List[Dict] | None:
                                  find_next('span', attrs={"data-price-amount": True}).
                                  get('data-price-amount'))
                 in_stock = variant.find(class_='col qty').get_text().strip()
-                stock = 0 if in_stock == 'Немає у наявності' else parser_config.PRODUCT_QTY
+                stock = 'outofstock' if in_stock == 'Немає у наявності' else 'instock'
                 product_attrs = {
                     'product_name': product_name,
                     'product_code': product_code,
@@ -107,8 +107,8 @@ def get_product_info(url: str) -> List[Dict] | None:
                              get('data-price-amount'))
 
             stock_unavailable = soup.find('div', class_='stock unavailable')
-            stock = 0 if stock_unavailable and stock_unavailable.text.strip() == 'Немає у наявності' \
-                else parser_config.PRODUCT_QTY
+            stock = 'outofstock' if stock_unavailable and stock_unavailable.text.strip() == 'Немає у наявності' \
+                else 'instock'
             product_attrs = {
                 'product_name': product_name,
                 'product_code': product_code,

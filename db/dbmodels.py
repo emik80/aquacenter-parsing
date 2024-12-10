@@ -36,7 +36,7 @@ class Product(BaseModel):
 
     product_code = CharField(null=True)
     price = IntegerField(null=True)
-    stock = IntegerField(null=True)
+    stock = CharField(null=True)
 
     description = TextField(null=True)
     specs_table = TextField(null=True)
