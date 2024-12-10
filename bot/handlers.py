@@ -111,7 +111,7 @@ async def process_command_run(callback: CallbackQuery, state: FSMContext):
             document=FSInputFile(output_filename),
             caption='Файл'
         )
-    if current_task:
+    if current_task and current_task.status == 'running':
         task_warning(current_task)
     await state.clear()
     await state.set_state(FSMCommon.active)
