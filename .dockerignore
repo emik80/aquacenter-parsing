@@ -1,7 +1,5 @@
 /venv/
 /logs
-/img
-/img_backup
 /.idea
 __pycache__/
 *.csv

@@ -12,7 +12,7 @@ services:
       - redis
     env_file:
       - .env
-    command: python bot/bot.py
+    command: python main.py
 
   redis:
     image: "redis:7.4.1-alpine3.20"
