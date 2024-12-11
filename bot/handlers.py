@@ -105,20 +105,25 @@ async def process_command_run(callback: CallbackQuery, state: FSMContext):
         target_category=target_category,
         user_message=message
     )
-    output_filename, current_task = await parser.run_parsing()
-    if output_filename:
-        await message.answer_document(
-            document=FSInputFile(output_filename),
-            caption='Файл'
-        )
-    if current_task and current_task.status == 'running':
-        task_warning(current_task)
-    await state.clear()
-    await state.set_state(FSMCommon.active)
     kb = create_inline_kb(
         parse='✅ Парсер'
     )
-    await message.edit_text(text='DONE', reply_markup=kb)
+    result = await parser.run_parsing()
+    if result is None:
+        logger.error('Parsing failed or returned no data.')
+        await message.edit_text(text='❌ Помилка', reply_markup=kb)
+    else:
+        output_filename, current_task = result
+        if output_filename:
+            await message.answer_document(
+                document=FSInputFile(output_filename),
+                caption='Файл'
+            )
+        if current_task and current_task.status == 'running':
+            task_warning(current_task)
+        await state.clear()
+        await state.set_state(FSMCommon.active)
+        await message.edit_text(text='DONE', reply_markup=kb)
 
 
 # Other messages

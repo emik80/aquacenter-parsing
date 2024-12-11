@@ -11,11 +11,14 @@ def main():
 
     parser = ParserCore(category_url=category_url,
                         target_category=target_category)
-    output_filename, current_task = parser.run_parsing()
-    if current_task and current_task.status == 'running':
-        task_warning(current_task)
-
-    print(f'Output filename: {output_filename}')
+    result = parser.run_parsing()
+    if result is None:
+        logger.error('Parsing failed or returned no data.')
+    else:
+        output_filename, current_task = parser.run_parsing()
+        if current_task and current_task.status == 'running':
+            task_warning(current_task)
+        print(f'Output filename: {output_filename}')
 
 
 if __name__ == '__main__':
