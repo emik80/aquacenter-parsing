@@ -8,9 +8,9 @@ from aiogram.filters import CommandStart, Command, StateFilter
 
 from config import logger
 from parser import ParserCoreTG
-from text import BOT_MESSAGES
-from keyboards import create_inline_kb
-from states import FSMCommon, FSMAdmin
+from bot.text import BOT_MESSAGES
+from bot.keyboards import create_inline_kb
+from bot.states import FSMCommon, FSMAdmin
 from db import task_warning
 
 
@@ -111,7 +111,9 @@ async def process_command_run(callback: CallbackQuery, state: FSMContext):
     result = await parser.run_parsing()
     if result is None:
         logger.error('Parsing failed or returned no data.')
-        await message.edit_text(text='❌ Помилка', reply_markup=kb)
+        await state.clear()
+        await state.set_state(FSMCommon.active)
+        await message.edit_text(text='❌ Некоректний URL', reply_markup=kb)
     else:
         output_filename, current_task = result
         if output_filename:

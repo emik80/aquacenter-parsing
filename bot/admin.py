@@ -4,11 +4,11 @@ from aiogram.types import Message, ReplyKeyboardRemove
 from aiogram.filters import Command, StateFilter
 
 from config import logger
-from filters import IsAdminFilter
-from text import ADMIN_MESSAGES
-from keyboards import admin_kb
+from bot.filters import IsAdminFilter
+from bot.text import ADMIN_MESSAGES
+from bot.keyboards import admin_kb
+from bot.states import FSMAdmin
 from db import db_add_user, db_delete_user, db_set_admin, db_remove_admin, db_get_admin_list, db_get_user_list
-from states import FSMAdmin
 
 router = Router()
 router.message.filter(F.chat.type.in_({"private"}))

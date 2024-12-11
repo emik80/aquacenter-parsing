@@ -4,10 +4,10 @@ from aiogram import Bot, Dispatcher
 from aiogram.exceptions import TelegramNetworkError
 from aiogram.fsm.storage.redis import RedisStorage, Redis
 
-import handlers as user_handlers
-import admin as admin
-from middlewares import setup_middlewares
-from keyboards import set_main_menu
+import bot.handlers as user_handlers
+import bot.admin as admin
+from bot.middlewares import setup_middlewares
+from bot.keyboards import set_main_menu
 from config import logger, parser_config
 from db import db, initialize_database
 

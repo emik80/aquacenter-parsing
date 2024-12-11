@@ -6,7 +6,7 @@ from peewee import DoesNotExist
 
 from config import logger
 from db import User
-from text import BOT_MESSAGES, ADMIN_MESSAGES
+from bot.text import BOT_MESSAGES, ADMIN_MESSAGES
 
 
 class IsAdminFilter(BaseFilter):

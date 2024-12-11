@@ -5,7 +5,7 @@ from peewee import DoesNotExist
 
 from config import logger, parser_config
 from db import User, Task
-from text import BOT_MESSAGES
+from bot.text import BOT_MESSAGES
 
 
 class AllowedUsersMiddleware(BaseMiddleware):

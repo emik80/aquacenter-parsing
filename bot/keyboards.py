@@ -3,7 +3,7 @@ from aiogram.types import BotCommand, KeyboardButton
 from aiogram.utils.keyboard import InlineKeyboardBuilder, ReplyKeyboardBuilder
 from aiogram.types import InlineKeyboardMarkup, InlineKeyboardButton
 
-from text import MENU_COMMANDS
+from bot.text import MENU_COMMANDS
 
 
 async def set_main_menu(bot: Bot):

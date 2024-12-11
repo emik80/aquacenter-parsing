@@ -18,6 +18,7 @@ DATABASE = 'products.db'
 LOG_DIR = 'logs'
 PRODUCTION = os.getenv("PRODUCTION", "FALSE").upper() == "TRUE"
 
+
 @dataclass
 class BaseParserConfig:
     MAIN_DOMAIN: str
