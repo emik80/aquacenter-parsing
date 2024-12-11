@@ -4,7 +4,7 @@ import re
 from typing import Dict, List
 
 import service as service_tools
-from config import logger, parser_config
+from config import logger
 
 
 def get_product_list(category_url: str) -> Dict | None:

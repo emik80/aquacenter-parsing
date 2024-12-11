@@ -3,7 +3,7 @@ from typing import Union
 from aiogram import Router, F
 from aiogram.fsm.context import FSMContext
 from aiogram.fsm.state import default_state
-from aiogram.types import Message, ReplyKeyboardRemove, CallbackQuery, FSInputFile
+from aiogram.types import Message, CallbackQuery, FSInputFile
 from aiogram.filters import CommandStart, Command, StateFilter
 
 from config import logger

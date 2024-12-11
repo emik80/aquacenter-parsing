@@ -3,7 +3,7 @@ from typing import List
 
 from db import Task, User
 from config import logger
-from peewee import OperationalError, DatabaseError, DoesNotExist, PeeweeException
+from peewee import OperationalError, DatabaseError, PeeweeException
 
 
 # Tasks
