@@ -19,9 +19,9 @@ class IsAdminFilter(BaseFilter):
             if user.is_admin:
                 return True
             else:
-                await event.answer(text=f"{ADMIN_MESSAGES['not_admin']}")
+                await event.answer(text=f"{ADMIN_MESSAGES.get('not_admin')}")
                 logger.warning(f'Admin access denied - {user}')
                 return False
         except DoesNotExist:
             logger.warning(f'Admin access warning - {event.from_user.id}')
-            await event.answer(text=f"{BOT_MESSAGES['unknown_user']}")
+            await event.answer(text=f"{BOT_MESSAGES.get('unknown_user')}")

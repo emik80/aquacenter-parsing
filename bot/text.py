@@ -30,5 +30,6 @@ ADMIN_MESSAGES = {
     'input_id': '🔽 Enter User ID',
     'done': 'Process completed',
     'logout': 'You are logged out of administrator mode, type /start to work with bot in standard mode',
-    'not_admin': '⚠ You do not have permission to do this action!'
+    'not_admin': '⚠ You do not have permission to do this action!',
+    'error': 'Error with this operation'
 }
