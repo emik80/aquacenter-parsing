@@ -1,6 +1,7 @@
 from datetime import datetime
 
-from peewee import SqliteDatabase, Model, CharField, TextField, DateTimeField, IntegerField, BooleanField
+from peewee import SqliteDatabase, Model, CharField, TextField, DateTimeField, IntegerField, BooleanField, \
+    OperationalError, DatabaseError
 
 from config import parser_config, logger
 
@@ -60,6 +61,16 @@ def initialize_database(db: SqliteDatabase):
         with db:
             db.create_tables([Task, Product, User], safe=True)
             logger.success('DB initialized')
+            User.get_or_create(tg_user_id=parser_config.SUPERADMIN,
+                               tg_username='SUPERADMIN',
+                               is_admin=True)
+            for user in parser_config.ADMINS:
+                User.get_or_create(tg_user_id=user,
+                                   is_admin=True)
+    except OperationalError as ex:
+        logger.exception(f'Database connection issue: {ex}')
+    except DatabaseError as ex:
+        logger.exception(f'Database query error: {ex}')
     except Exception as ex:
-        logger.error(f"Error writing data: {ex}")
+        logger.error(f'Initialize_database error: {ex}')
         return
