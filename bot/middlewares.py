@@ -1,6 +1,6 @@
 from aiogram import BaseMiddleware, Bot, Dispatcher
 from aiogram.types import Message, CallbackQuery, TelegramObject
-from typing import Callable, Dict, Any, Awaitable
+from typing import Callable, Dict, Any, Awaitable, Union
 from peewee import DoesNotExist
 
 from config import logger, parser_config
@@ -36,9 +36,8 @@ class AllowedUsersMiddleware(BaseMiddleware):
                          f'username: @{event.from_user.username}\n'
                          f'name: {event.from_user.first_name} {event.from_user.last_name}'
                 )
-                await (event.answer(BOT_MESSAGES.get('unknown_user'))
-                       if isinstance(event, CallbackQuery)
-                       else event.reply(BOT_MESSAGES.get('unknown_user')))
+                await event.answer(BOT_MESSAGES.get('unknown_user'))
+            return
 
 
 class TaskCheckMiddleware(BaseMiddleware):
@@ -55,5 +54,6 @@ class TaskCheckMiddleware(BaseMiddleware):
 
 
 def setup_middlewares(dp: Dispatcher, bot: Bot):
-    dp.update.outer_middleware(AllowedUsersMiddleware(bot=bot))
+    dp.message.outer_middleware(AllowedUsersMiddleware(bot=bot))
+    dp.callback_query.outer_middleware(AllowedUsersMiddleware(bot=bot))
     dp.callback_query.middleware(TaskCheckMiddleware())
