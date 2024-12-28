@@ -15,7 +15,7 @@ def main():
     if result is None:
         logger.error('Parsing failed or returned no data.')
     else:
-        output_filename, current_task = parser.run_parsing()
+        output_filename, current_task = result[0], result[1]
         if current_task and current_task.status == 'running':
             task_warning(current_task)
         print(f'Output filename: {output_filename}')
