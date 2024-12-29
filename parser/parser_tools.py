@@ -4,7 +4,7 @@ import re
 from typing import Dict, List
 
 import service as service_tools
-from config import logger
+from config import logger, parser_config
 
 
 def get_product_list(category_url: str) -> Dict | None:
@@ -102,12 +102,16 @@ def get_product_info(url: str) -> List[Dict] | None:
             product_name = soup.find('h1').text.strip()
             product_code = (soup.find('div', class_='product attribute sku').
                             find_next('div', class_='value').text.strip())
-            product_price = (soup.find('div', class_='product-info-price').
-                             find('span', attrs={"data-price-amount": True}).
-                             get('data-price-amount'))
+            product_price_box = (soup.find('div', class_='product-info-price').
+                                find('span', attrs={"data-price-amount": True}))
+            if product_price_box:
+                product_price = product_price_box.get('data-price-amount')
+            else:
+                product_price = 0
 
+            stock_preorder = soup.find('div', class_='stock preorder')
             stock_unavailable = soup.find('div', class_='stock unavailable')
-            stock = 'outofstock' if stock_unavailable and stock_unavailable.text.strip() == 'Немає у наявності' \
+            stock = 'outofstock' if stock_unavailable or stock_preorder or product_price == 0\
                 else 'instock'
             product_attrs = {
                 'product_name': product_name,
@@ -123,8 +127,12 @@ def get_product_info(url: str) -> List[Dict] | None:
                      .find_next('tbody'))
         specs_clean = service_tools.parse_table_data(specs_html=specs_raw)
         specs_table = service_tools.dict_to_html_table(data_dict=specs_clean)
-        img_block = soup.find('div', class_='MagicToolboxSelectorsContainer').find_all('a')
-        images = '|'.join([i.get('href') for i in img_block])
+        default_img = soup.find('div', class_='MagicToolboxContainer placeholder')
+        if default_img:
+            images = parser_config.DEFAULT_IMG
+        else:
+            img_block = soup.find('div', class_='MagicToolboxSelectorsContainer').find_all('a')
+            images = '|'.join([i.get('href') for i in img_block if i.get('href') != '#'])
 
         for product in res:
             product['product_url'] = url

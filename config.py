@@ -22,6 +22,7 @@ PRODUCTION = os.getenv("PRODUCTION", "FALSE").upper() == "TRUE"
 @dataclass
 class BaseParserConfig:
     MAIN_DOMAIN: str
+    DEFAULT_IMG: str
     HEADERS: dict
     DATA_DIR: Path
     DATABASE: Path
@@ -43,6 +44,7 @@ def load_config():
 
     config = BaseParserConfig(
         MAIN_DOMAIN=os.getenv('MAIN_DOMAIN'),
+        DEFAULT_IMG=os.getenv('DEFAULT_IMG'),
         HEADERS=headers,
         DATA_DIR=Path(ROOT_DIR.parent, DATA_DIR),
         DATABASE=Path(ROOT_DIR.parent, DATA_DIR, DATABASE),
